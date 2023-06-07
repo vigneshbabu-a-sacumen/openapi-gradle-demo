@@ -1,0 +1,60 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.1.0'
+	id 'io.spring.dependency-management' version '1.1.0'
+	id "org.springdoc.openapi-gradle-plugin" version "1.6.0"
+	id 'org.openapi.generator' version "6.6.0"
+}
+
+group = 'com.openapi-gen-demo'
+version = '1'
+sourceCompatibility = '17'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+
+	//	implementation 'org.springframework.boot:spring-boot-starter-validation:2.7.12';
+	implementation 'javax.validation:validation-api:2.0.1.Final'
+
+	//	implementation group: 'jakarta.annotation', name: 'jakarta.annotation-api', version: '2.1.0'
+	implementation group: 'javax.annotation', name: 'javax.annotation-api', version: '1.2-b01'
+
+	compileOnly group: 'javax.servlet', name: 'javax.servlet-api', version: '3.0.1'
+
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+	implementation group: 'org.openapitools', name: 'jackson-databind-nullable', version: '0.2.4'
+	implementation group: 'io.swagger', name: 'swagger-annotations', version: '1.6.8'
+	implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.14'
+
+//	implementation group: 'io.swagger.parser.v3', name: 'swagger-parser', version: '2.1.10'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.12.3'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+openApiGenerate {
+	generatorName = "spring"
+	inputSpec = "$rootDir/src/main/resources/petstore.yaml".toString()
+	outputDir = "${buildDir}/generated/sources/openapi".toString()
+	apiPackage = "com.demo.petstore.api"
+	invokerPackage = "com.demo.petstore.invoker"
+	modelPackage = "com.demo.petstore.model"
+	configOptions = [ delegatePattern: "true", dateLibrary: "java8", serializableModel: "true" ]
+}
+
+compileJava.dependsOn tasks.openApiGenerate
+
+sourceSets.main.java.srcDirs += "$buildDir/generated/sources/openapi/src/main/java"
+
+springBoot {
+			//	mainClass = "com.demo.petstore.invoker.OpenApiGeneratorApplication"
+			mainClass = "com.openapi.openapigendemo.OpenapiGenDemoApplication"
+}
